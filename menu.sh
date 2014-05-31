@@ -2,15 +2,51 @@
 # SCRIPT: method1.sh
 # PURPOSE: Process a file line by line with PIPED while-read loop.
 
-count=0
-SITES=( )
-
 echo "Choose an option"
-echo "0> add new site"
-cat example_db | while read DATABASE_ROW
+echo "0> Add new site"
+count=0
+cat example_db | while read domain_info
 do
 	let count++
 
-	IFS=',' read -a SITE_DETAILS <<< "$DATABASE_ROW"
-	echo "$count> ${SITE_DETAILS[0]}"
+	IFS=',' read -a domain_columns <<< "$domain_info"
+	echo "$count> ${domain_columns[0]^}"
 done
+
+read option
+
+
+if  [ $option == 0 ]; then
+	echo "Enter domain"
+	read domain
+	echo "Choose option"
+	echo "0> No restrictions"
+	echo "1> Short with special characters"
+	echo "2> Short without special characters"
+	read restrictions
+else
+	domain_info=$(sed "${option}q;d" example_db)
+	IFS=',' read -a domain_columns <<< "$domain_info"
+	domain=${domain_columns[0]}
+	password_index=${domain_columns[1]}
+	restrictions=${domain_columns[2]}
+
+	echo "enter pass"
+	read -s password
+	randa='GF3$8k44d;&(1&H'
+	randb='Ckj93#@ukockgoc'
+	md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')
+
+	echo "Password"
+	if [ $restrictions == 0 ]; then
+		password=$md5
+	elif [ $restrictions == 1 ]; then
+		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
+		first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
+		password=${first_char}${md5:0:4}${special_chars}${md5:9:4}
+	elif [ $restrictions == 2 ]; then
+		first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
+		password=${first_char}${md5:1:8}
+	fi
+	echo $password | xclip -selection c
+fi
