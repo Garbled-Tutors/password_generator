@@ -1,0 +1,137 @@
+#!/bin/bash
+# SCRIPT: method1.sh
+# PURPOSE: Process a file line by line with PIPED while-read loop.
+
+count=0
+SITES=( )
+
+cat example_db | while read DATABASE_ROW
+do
+	let count++
+
+	IFS=', ' read -a SITE_DETAILS <<< "$DATABASE_ROW"
+	echo "$count> ${SITE_DETAILS[0]}"
+done
+
+
+#LINE=$(cat example_db)
+#ONE_LINER=$(cat example_db | tr "\n" ",")
+#echo $LINE
+#echo $ONE_LINER
+
+#count=0
+#cat example_db | while read LINE
+#do
+	#let count++
+
+	#arr=$(echo $LINE | tr "	" "\n")
+	#SITES[$count]=$arr[0]
+
+	##for x in $arr
+	##do
+			##echo "> [$x]"
+	##done
+#done
+
+#echo ${SITES[*]}
+
+
+
+#echo $FILE_CONTENTS | tr "\n" ", "
+
+#ONE_LINER=${FILE_CONTENTS//\n/, }
+#echo $ONE_LINER
+
+#IFS=', ' read -a array <<< "$LINE"
+
+#for x in $arr
+#do
+	#echo "> [$x]"
+#done
+
+
+
+#SITES=( )
+#echo "Empty Site Array"
+#echo ${SITES[*]}
+#LINE="zappos, 1, 1"
+#echo "Line Buffer"
+#echo $LINE
+
+#echo "
+#First Column"
+#IFS=', ' read -a array <<< "$LINE"
+#echo ${array[0]}
+
+#SITES[0]=${array[0]}
+#SITES[1]=four
+#echo "
+#New Site Array"
+#echo ${SITES[*]}
+
+
+#count=2
+#echo "
+#Count"
+#echo $count
+
+#SITES[$count]=hutn
+#echo "
+#Adjusted Array"
+#echo ${SITES[*]}
+
+
+
+
+#count=0
+#SITES=( )
+
+##while read DATABASE_ROW do ... done <<< "$OUTPUT"
+
+#cat example_db | while read DATABASE_ROW
+#do
+	#let count++
+
+	#IFS=', ' read -a SITE_DETAILS <<< "$DATABASE_ROW"
+
+	#SITES[$count]=${SITE_DETAILS[0]}
+#done
+
+#echo ${SITES[*]}
+
+#count=0
+#SITES=(one two)
+#cat example_db | while read LINE
+#do
+	#let count++
+	##echo "$count $LINE"
+
+	#arr=$(echo $LINE | tr "	" "\n")
+	#SITES[$count]=$arr[0]
+
+	##for x in $arr
+	##do
+			##echo "> [$x]"
+	##done
+#done
+
+#echo ${SITES[*]}
+
+
+
+
+#ARRAY=(one two three)
+#echo ${ARRAY[*]}
+                     #one two three
+#echo ${ARRAY[2]}
+                     #three
+#fg
+
+
+#.sh
+#echo ${ARRAY[2]}
+                     #three
+#echo ${ARRAY[*]}
+                     #one two three
+#ARRAY[1]=four
+#echo ${ARRAY[*]}
