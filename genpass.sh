@@ -5,7 +5,7 @@
 echo "Choose an option"
 echo "0> Add new site"
 count=0
-cat example_db | while read domain_info
+cat ~/.genpass/pass_db | while read domain_info
 do
 	let count++
 
@@ -24,8 +24,10 @@ if  [ $option == 0 ]; then
 	echo "1> Short with special characters"
 	echo "2> Short without special characters"
 	read restrictions
+	#not yet implemented.... do it by hand
+	#cat ~/.genpass/pass_db | sed '$a/Text to append' > outFile
 else
-	domain_info=$(sed "${option}q;d" example_db)
+	domain_info=$(sed "${option}q;d" ~/.genpass/pass_db)
 	IFS=',' read -a domain_columns <<< "$domain_info"
 	domain=${domain_columns[0]}
 	password_index=${domain_columns[1]}
@@ -39,7 +41,8 @@ else
 
 	echo "Password"
 	if [ $restrictions == 0 ]; then
-		password=$md5
+		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
+		password=${md5:0:3}${special_chars}${md5:3}
 	elif [ $restrictions == 1 ]; then
 		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
 		first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
