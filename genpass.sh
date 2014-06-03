@@ -35,8 +35,10 @@ else
 
 	echo "enter pass"
 	read -s password
-	randa='GF3$8k44d;&(1&H'
-	randb='Ckj93#@ukockgoc'
+	#randa='GF3$8k44d;&(1&H'
+	#randb='Ckj93#@ukockgoc'
+	randa=$(sed "1q;d" ~/.genpass/pass_salt)
+	randb=$(sed "2q;d" ~/.genpass/pass_salt)
 	md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')
 
 	echo "Password"
