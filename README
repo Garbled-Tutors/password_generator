@@ -1,0 +1,14 @@
+This program needs two files to function, both of them should be in a folder called '.genpass' located in your home directory.  This repo contains examples of these files.
+
+~/.genpass/pass_salt
+
+this contains two lines of data that should be completely random. Change these values to whatever combination of upper and lower letters, numbers, and special characters you wish. Backup this file because without it recovering the passwords will impossible.
+
+~/.genpass/pass_db
+
+This contains a list of websites with saved values. Future versions of this program will enable generation of passwords without a stored profile. The current version requires manual editing of this file. 
+There are three columns for each profile.
+
+Column One - This is the name of the website.
+Column Two - This is the iteration of the password. Good password practices require changing your password from time to time, and in order to do this you can increment this value. When adding a new profile I start with the value of one, but any starting point is fine. I recommend choosing the same value for each profile and choosing a number like one or zero so that you will remember in the event that this file is lost or corrupted.
+Colmun Three - This is used to control the length and characters used in the password. Many jackass webdevelopers decided they wanted to enforce rules password length and composition and created websites limiting password lengths and preventing special characters. This column is used to conform to their rules. At the moment only 3 values are used, but with more usage of this program I will adjust this to create several uniform templates that will work with most websites
