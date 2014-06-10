@@ -41,7 +41,7 @@ else
 	randb=$(sed "2q;d" ~/.genpass/pass_salt)
 	md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')
 
-	echo "Password"
+	#echo "Password"
 	if [ $restrictions == 0 ]; then
 		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
 		password=${md5:0:3}${special_chars}${md5:3}
@@ -53,5 +53,7 @@ else
 		first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
 		password=${first_char}${md5:1:8}
 	fi
-	echo $password | xclip -selection c
+	echo "Password saved to clipboard"
+	echo $password | xclip -selection c # this saves the password so that outside applications can read the clipboard
+	echo $password | xclip -i # this saves the password so that bash can read the clipboard
 fi
