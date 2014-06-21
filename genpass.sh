@@ -4,9 +4,10 @@
 function get_password {
 	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
 	IFS=',' read -a domain_columns <<< "$domain_info"
-	domain=${domain_columns[0]}
-	password_index=${domain_columns[1]}
-	restrictions=${domain_columns[2]}
+	category=${domain_columns[0]}
+	domain=${domain_columns[1]}
+	password_index=${domain_columns[2]}
+	restrictions=${domain_columns[3]}
 
 	echo "enter pass"
 	read -s password  </dev/tty
@@ -30,34 +31,71 @@ function get_password {
 	echo $password | xclip -i # this saves the password so that bash can read the clipboard
 }
 
-if [ $# == 0 ]; then
-	echo "Choose an option"
-	echo "0> Add new site"
-	count=0
-	cat ~/.genpass/pass_db | while read domain_info
-	do
-		let count++
+declare -A password_array
 
-		IFS=',' read -a domain_columns <<< "$domain_info"
-		echo "$count> ${domain_columns[0]^}"
+read_password_db() {
+	i=0
+
+	while read line
+	do
+		IFS=',' read -a account_array <<< "$line"
+		if ! [[ ${password_array[${account_array[0]}]} ]]; then 
+			password_array["${account_array[0]}"]=""
+		fi
+		category_name="${account_array[0]}"
+		old_value=${password_array["${category_name}"]}
+		password_array["${category_name}"]="${old_value}$i,${line} "
+		account_info_list[i]=$line # Put it into the array
+		i=$(($i + 1))
+	done < $1
+}
+
+ask_user_to_select_account() {
+	echo "Choose an category"
+	echo "0> Add new site"
+	
+	read_password_db ~/.genpass/pass_db
+
+	count=0
+	category_keys=( 'nil' )
+	for category in "${!password_array[@]}"
+	do
+		category_keys+=( "${category}" )
+		let count++
+		echo "$count> ${category^}"
 	done
 
-	read option
+	read category_index
 
+	if ! [ $category_index == 0 ]; then
+		category_key=${category_keys[$category_index]}
+		echo "Choose an site from $category_key"
+		echo "0> Add new site"
 
-	if  [ $option == 0 ]; then
-		echo "Enter domain"
-		read domain
-		echo "Choose option"
-		echo "0> No restrictions"
-		echo "1> Short with special characters"
-		echo "2> Short without special characters"
-		read restrictions
-		#not yet implemented.... do it by hand
-		#cat ~/.genpass/pass_db | sed '$a/Text to append' > outFile
-	else
-		get_password $option
+		account_list_string=${password_array["$category_key"]}
+		IFS=' ' read -a account_list_array <<< "$account_list_string"
+
+		count=0
+		account_line_index=( )
+		for account_data_string in "${account_list_array[@]}"
+		do
+			let count++
+			IFS=',' read -a account_data_array <<< "$account_data_string"
+			account_line_index+=(${account_data_array[0]})
+			echo "$count> ${account_data_array[2]^}"
+		done
+
+		read site_index
+
+		selected_site_index=${account_line_index[$site_index-1]}
 	fi
+}
+
+if [ $# == 0 ]; then
+
+	ask_user_to_select_account
+	get_password $selected_site_index
+
 else
 	cat ~/.genpass/pass_db | while read domain_info
 	do
@@ -65,7 +103,7 @@ else
 
 		IFS=',' read -a domain_columns <<< "$domain_info"
 
-		if [ "${domain_columns[3]}" = "$1" -o "${domain_columns[0]}" = "$1" ]; then
+		if [ "${domain_columns[4]}" = "$1" -o "${domain_columns[1]}" = "$1" ]; then
 			get_password $count
 		fi
 	done
