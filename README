@@ -12,3 +12,10 @@ There are three columns for each profile.
 Column One - This is the name of the website.
 Column Two - This is the iteration of the password. Good password practices require changing your password from time to time, and in order to do this you can increment this value. When adding a new profile I start with the value of one, but any starting point is fine. I recommend choosing the same value for each profile and choosing a number like one or zero so that you will remember in the event that this file is lost or corrupted.
 Colmun Three - This is used to control the length and characters used in the password. Many jackass webdevelopers decided they wanted to enforce rules password length and composition and created websites limiting password lengths and preventing special characters. This column is used to conform to their rules. At the moment only 3 values are used, but with more usage of this program I will adjust this to create several uniform templates that will work with most websites
+
+
+
+
+TODO List
+
+I want to have multiple pass_salt files so that two users can share a common pass_salt, but use different pass_salts for seperate projects. This will likely be done with a default salt, and a parameter at the beginning specifying to use alternate salt
