@@ -9,9 +9,10 @@ function get_password {
 	domain=${domain_columns[1]}
 	password_index=${domain_columns[2]}
 	restrictions=${domain_columns[3]}
+	#echo "enter pass"
+	#read -s password  </dev/tty
+	read -sp "Enter pass: " password
 
-	echo "enter pass"
-	read -s password  </dev/tty
 	randa=$(sed "1q;d" ~/.genpass/pass_salt)
 	randb=$(sed "2q;d" ~/.genpass/pass_salt)
 	#md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')# old code
@@ -101,7 +102,7 @@ if [ $# == 0 ]; then
 	get_password $selected_site_index
 
 else
-	cat ~/.genpass/pass_db | while read domain_info
+	while read -r -u 6 domain_info
 	do
 		let count++
 
@@ -110,5 +111,5 @@ else
 		if [ "${domain_columns[4]}" = "$1" -o "${domain_columns[1]}" = "$1" ]; then
 			get_password $count
 		fi
-	done
+	done 6< ~/.genpass/pass_db 
 fi
