@@ -2,6 +2,7 @@
 # SCRIPT: method1.sh
 # PURPOSE: Process a file line by line with PIPED while-read loop.
 function get_password {
+	#echo "Password Index: {$1}"; #for debugging purposes
 	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
 	IFS=',' read -a domain_columns <<< "$domain_info"
 	category=${domain_columns[0]}
@@ -13,7 +14,8 @@ function get_password {
 	read -s password  </dev/tty
 	randa=$(sed "1q;d" ~/.genpass/pass_salt)
 	randb=$(sed "2q;d" ~/.genpass/pass_salt)
-	md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')
+	#md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')# old code
+	md5=$(echo -n $domain$randa$password_index$category$randb$password | md5sum | cut -f1 -d' ')
 
 	if [ $restrictions == 0 ]; then
 		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
@@ -44,9 +46,9 @@ read_password_db() {
 		fi
 		category_name="${account_array[0]}"
 		old_value=${password_array["${category_name}"]}
-		password_array["${category_name}"]="${old_value}$i,${line} "
 		account_info_list[i]=$line # Put it into the array
 		i=$(($i + 1))
+		password_array["${category_name}"]="${old_value}$i,${line} "
 	done < $1
 }
 
@@ -88,6 +90,8 @@ ask_user_to_select_account() {
 		read site_index
 
 		selected_site_index=${account_line_index[$site_index-1]}
+	else
+		echo "Feature Not Yet Implemented"
 	fi
 }
 
