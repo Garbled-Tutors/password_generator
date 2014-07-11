@@ -55,6 +55,7 @@ read_password_db() {
 
 ask_user_to_select_account() {
 	echo "Choose an category"
+	echo "e> Export passwords"
 	echo "0> Add new site"
 	
 	read_password_db ~/.genpass/pass_db
@@ -70,7 +71,13 @@ ask_user_to_select_account() {
 
 	read category_index
 
-	if ! [ $category_index == 0 ]; then
+	if [ $category_index == 'e' ]; then
+		echo "Feature Not Yet Implemented"
+		exit 1
+	elif [ $category_index == 0 ]; then
+		echo "Feature Not Yet Implemented"
+		exit 1
+	elif [ $category_index -ge 1 -a $category_index -le ${#password_array[@]} ]; then
 		category_key=${category_keys[$category_index]}
 		echo "Choose an site from $category_key"
 		echo "0> Add new site"
@@ -92,7 +99,8 @@ ask_user_to_select_account() {
 
 		selected_site_index=${account_line_index[$site_index-1]}
 	else
-		echo "Feature Not Yet Implemented"
+		echo "Unknown Response"
+		exit 1
 	fi
 }
 
