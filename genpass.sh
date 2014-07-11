@@ -37,7 +37,7 @@ function get_password {
 	read -sp "Enter pass: " password
 	calc_password "${1}" "${password}"
 
-	echo "$calculated_password"
+	#echo "$calculated_password" #for debugging purposes
 	echo "Password saved to clipboard"
 	echo $calculated_password | xclip -selection c # this saves the password so that outside applications can read the clipboard
 	echo $calculated_password | xclip -i # this saves the password so that bash can read the clipboard
@@ -115,18 +115,23 @@ if [ $# == 0 ]; then
 	get_password $selected_site_index
 
 elif [ $1 == 'export' ]; then
+	read -sp "Enter pass: " password
 	echo "Not yet implemented";
-	exit 1;
+	#exit 1;
+		#calc_password "${1}" "${password}"
+		#echo "$calculated_password"
+
 	while read -r -u 6 domain_info
 	do
 		let count++
 
 		IFS=',' read -a domain_columns <<< "$domain_info"
 
+		calc_password "${count}" "${password}"
 		if [[ -z "${domain_columns[1]}" ]]; then
-			echo "${domain_columns[4]}";
+			echo "${domain_columns[4]}      ${calculated_password}";
 		else
-			echo "${domain_columns[1]}";
+			echo "${domain_columns[1]}      ${calculated_password}";
 		fi
 
 	done 6< ~/.genpass/pass_db 
