@@ -2,64 +2,45 @@
 # SCRIPT: method1.sh
 # PURPOSE: Process a file line by line with PIPED while-read loop.
 
-#function calc_password {
-	#domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
-	#IFS=',' read -a domain_columns <<< "$domain_info"
-	#category=${domain_columns[0]}
-	#domain=${domain_columns[1]}
-	#password_index=${domain_columns[2]}
-	#restrictions=${domain_columns[3]}
+declare calculated_password
 
-	#randa=$(sed "1q;d" ~/.genpass/pass_salt)
-	#randb=$(sed "2q;d" ~/.genpass/pass_salt)
-	##md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')# old code
-	#md5=$(echo -n $domain$randa$password_index$category$randb$password | md5sum | cut -f1 -d' ')
-
-	#if [ $restrictions == 0 ]; then
-		#special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
-		#password=${md5:0:3}${special_chars}${md5:3}
-	#elif [ $restrictions == 1 ]; then
-		#special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
-		#first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
-		#password=${first_char}${md5:0:4}${special_chars}${md5:9:4}
-	#elif [ $restrictions == 2 ]; then
-		#first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
-		#password=${first_char}${md5:1:8}
-	#fi
-
-#}
-
-function get_password {
-	#echo "Password Index: {$1}"; #for debugging purposes
+function calc_password {
+	# Expects two parameters 1: account line number, and 2: password
 	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
 	IFS=',' read -a domain_columns <<< "$domain_info"
 	category=${domain_columns[0]}
 	domain=${domain_columns[1]}
 	password_index=${domain_columns[2]}
 	restrictions=${domain_columns[3]}
-	#echo "enter pass"
-	#read -s password  </dev/tty
-	read -sp "Enter pass: " password
+	password=${2}
 
 	randa=$(sed "1q;d" ~/.genpass/pass_salt)
 	randb=$(sed "2q;d" ~/.genpass/pass_salt)
-	#md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')# old code
 	md5=$(echo -n $domain$randa$password_index$category$randb$password | md5sum | cut -f1 -d' ')
 
 	if [ $restrictions == 0 ]; then
 		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
-		password=${md5:0:3}${special_chars}${md5:3}
+		calculated_password=${md5:0:3}${special_chars}${md5:3}
 	elif [ $restrictions == 1 ]; then
 		special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
 		first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
-		password=${first_char}${md5:0:4}${special_chars}${md5:9:4}
+		calculated_password=${first_char}${md5:0:4}${special_chars}${md5:9:4}
 	elif [ $restrictions == 2 ]; then
 		first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
-		password=${first_char}${md5:1:8}
+		calculated_password=${first_char}${md5:1:8}
 	fi
+
+}
+
+function get_password {
+	#echo "Password Index: {$1}"; #for debugging purposes
+	read -sp "Enter pass: " password
+	calc_password "${1}" "${password}"
+
+	echo "$calculated_password"
 	echo "Password saved to clipboard"
-	echo $password | xclip -selection c # this saves the password so that outside applications can read the clipboard
-	echo $password | xclip -i # this saves the password so that bash can read the clipboard
+	echo $calculated_password | xclip -selection c # this saves the password so that outside applications can read the clipboard
+	echo $calculated_password | xclip -i # this saves the password so that bash can read the clipboard
 }
 
 declare -A password_array
