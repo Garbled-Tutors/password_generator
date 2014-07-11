@@ -114,6 +114,9 @@ if [ $# == 0 ]; then
 	ask_user_to_select_account
 	get_password $selected_site_index
 
+elif [ $1 == 'debug' ]; then
+	echo "Debug mode"
+	exit 1
 elif [ $# == 2 ]; then
 	read -sp "Enter pass: " password
 	results=''
