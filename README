@@ -10,8 +10,10 @@ This contains a list of websites with saved values. Future versions of this prog
 There are three columns for each profile.
 
 Column One - This is the name of the website.
-Column Two - This is the iteration of the password. Good password practices require changing your password from time to time, and in order to do this you can increment this value. When adding a new profile I start with the value of one, but any starting point is fine. I recommend choosing the same value for each profile and choosing a number like one or zero so that you will remember in the event that this file is lost or corrupted.
-Colmun Three - This is used to control the length and characters used in the password. Many jackass webdevelopers decided they wanted to enforce rules password length and composition and created websites limiting password lengths and preventing special characters. This column is used to conform to their rules. At the moment only 3 values are used, but with more usage of this program I will adjust this to create several uniform templates that will work with most websites
+Column Two - The category of the website
+Column Three - This is the iteration of the password. Good password practices require changing your password from time to time, and in order to do this you can increment this value. When adding a new profile I start with the value of one, but any starting point is fine. I recommend choosing the same value for each profile and choosing a number like one or zero so that you will remember in the event that this file is lost or corrupted.
+Colmun Four - This is used to control the length and characters used in the password. Many jackass webdevelopers decided they wanted to enforce rules password length and composition and created websites limiting password lengths and preventing special characters. This column is used to conform to their rules. At the moment only 3 values are used, but with more usage of this program I will adjust this to create several uniform templates that will work with most websites
+Column Five - Account Nickname
 
 
 
@@ -19,3 +21,40 @@ Colmun Three - This is used to control the length and characters used in the pas
 TODO List
 
 I want to have multiple pass_salt files so that two users can share a common pass_salt, but use different pass_salts for seperate projects. This will likely be done with a default salt, and a parameter at the beginning specifying to use alternate salt
+
+
+
+Next Version
+
+Autocomplete, multiple pass_salt, configurable password outputs - FUCK YEAH!, and exporting password
+
+
+First off configurable password outputs
+
+All passwords will fit into a few categories
+
+
+New columns
+
+Column One - This is the name of the website.
+Column Two - The category of the website
+Column Three - This is the iteration of the password. Good password practices require changing your password from time to time, and in order to do this you can increment this value. When adding a new profile I start with the value of one, but any starting point is fine. I recommend choosing the same value for each profile and choosing a number like one or zero so that you will remember in the event that this file is lost or corrupted.
+Colmun Four - This will control what the password looks like, and will be used for websites with password restrictions. So flexible websites will have a value 0 here, and non flexible will be 0+each restriction. For example websites with length restrctions and disallow numbers would have a value of either 17 (0+1+16) or 18 (0+2+16). 17 would generate a password with a length of 6 and 18 would generate a length of 8.
+		0: No length restrictions 			000000
+		1: Length of 6 									000001
+		2: Length of 8 									000010
+		3: Length of 12 								000011
+		0: Include special characters 	000000
+		4: Only common special chars 		000100
+		8: No special chars 						001000
+		0: Numbers required 						000000
+		16: No numbers 									010000
+		0: Uppercase required 					000000
+		32: No uppercase 								100000
+		0: First char must be letter 		000000
+Column Five - Account Nickname
+
+
+Exporting Passwords. You may find the need to export everypassword. This can be used to have a copy of your passwords on your phone, or to backup up every password when migrating to a new version of code. I will create a new command that will create a file inside .genpass that will have every password.
+
+Password Migrations: This program will begin looking for a file called .genpass/use_pass this file will be a list of two columns. The first column will be account name or nick name, and the password. This will be in the same format as the exported passwords. This file will provide an alternative password for the user, the main reason it would be used is when migrating to a new version.
