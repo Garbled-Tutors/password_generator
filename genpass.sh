@@ -1,6 +1,34 @@
 #!/bin/bash
 # SCRIPT: method1.sh
 # PURPOSE: Process a file line by line with PIPED while-read loop.
+
+#function calc_password {
+	#domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
+	#IFS=',' read -a domain_columns <<< "$domain_info"
+	#category=${domain_columns[0]}
+	#domain=${domain_columns[1]}
+	#password_index=${domain_columns[2]}
+	#restrictions=${domain_columns[3]}
+
+	#randa=$(sed "1q;d" ~/.genpass/pass_salt)
+	#randb=$(sed "2q;d" ~/.genpass/pass_salt)
+	##md5=$(echo -n $domain$randa$password_index$randb$password | md5sum | cut -f1 -d' ')# old code
+	#md5=$(echo -n $domain$randa$password_index$category$randb$password | md5sum | cut -f1 -d' ')
+
+	#if [ $restrictions == 0 ]; then
+		#special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
+		#password=${md5:0:3}${special_chars}${md5:3}
+	#elif [ $restrictions == 1 ]; then
+		#special_chars=$(echo ${md5:5:3} | tr 0-9A-Za-z \!\@\#\$\%\^\&\*)
+		#first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
+		#password=${first_char}${md5:0:4}${special_chars}${md5:9:4}
+	#elif [ $restrictions == 2 ]; then
+		#first_char=$(echo ${md5:0:1} | tr 0-9 a-z)
+		#password=${first_char}${md5:1:8}
+	#fi
+
+#}
+
 function get_password {
 	#echo "Password Index: {$1}"; #for debugging purposes
 	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
@@ -55,7 +83,6 @@ read_password_db() {
 
 ask_user_to_select_account() {
 	echo "Choose an category"
-	echo "e> Export passwords"
 	echo "0> Add new site"
 	
 	read_password_db ~/.genpass/pass_db
@@ -71,10 +98,7 @@ ask_user_to_select_account() {
 
 	read category_index
 
-	if [ $category_index == 'e' ]; then
-		echo "Feature Not Yet Implemented"
-		exit 1
-	elif [ $category_index == 0 ]; then
+	if [ $category_index == 0 ]; then
 		echo "Feature Not Yet Implemented"
 		exit 1
 	elif [ $category_index -ge 1 -a $category_index -le ${#password_array[@]} ]; then
@@ -99,8 +123,8 @@ ask_user_to_select_account() {
 
 		selected_site_index=${account_line_index[$site_index-1]}
 	else
-		echo "Unknown Response"
-		exit 1
+		echo "Unknown Response";
+		exit 1;
 	fi
 }
 
@@ -108,6 +132,23 @@ if [ $# == 0 ]; then
 
 	ask_user_to_select_account
 	get_password $selected_site_index
+
+elif [ $1 == 'export' ]; then
+	echo "Not yet implemented";
+	exit 1;
+	while read -r -u 6 domain_info
+	do
+		let count++
+
+		IFS=',' read -a domain_columns <<< "$domain_info"
+
+		if [[ -z "${domain_columns[1]}" ]]; then
+			echo "${domain_columns[4]}";
+		else
+			echo "${domain_columns[1]}";
+		fi
+
+	done 6< ~/.genpass/pass_db 
 
 else
 	while read -r -u 6 domain_info
