@@ -114,12 +114,10 @@ if [ $# == 0 ]; then
 	ask_user_to_select_account
 	get_password $selected_site_index
 
-elif [ $1 == 'export' ]; then
+elif [ $# == 2 ]; then
 	read -sp "Enter pass: " password
-	echo "Not yet implemented";
-	#exit 1;
-		#calc_password "${1}" "${password}"
-		#echo "$calculated_password"
+	results=''
+	newline=$'\n'
 
 	while read -r -u 6 domain_info
 	do
@@ -129,13 +127,14 @@ elif [ $1 == 'export' ]; then
 
 		calc_password "${count}" "${password}"
 		if [[ -z "${domain_columns[1]}" ]]; then
-			echo "${domain_columns[4]}      ${calculated_password}";
+			results="${results}${domain_columns[4]},${calculated_password}${newline}";
 		else
-			echo "${domain_columns[1]}      ${calculated_password}";
+			results="${results}${domain_columns[1]},${calculated_password}${newline}";
 		fi
 
 	done 6< ~/.genpass/pass_db 
 
+	echo "${results}" > "${2}"
 else
 	while read -r -u 6 domain_info
 	do
