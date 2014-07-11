@@ -3,6 +3,8 @@
 # PURPOSE: Process a file line by line with PIPED while-read loop.
 
 declare calculated_password
+declare -A password_array
+declare -A stored_password_array
 
 function calc_password {
 	# Expects two parameters 1: account line number, and 2: password
@@ -33,17 +35,40 @@ function calc_password {
 }
 
 function get_password {
-	#echo "Password Index: {$1}"; #for debugging purposes
-	read -sp "Enter pass: " password
-	calc_password "${1}" "${password}"
 
-	#echo "$calculated_password" #for debugging purposes
+	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
+	IFS=',' read -a domain_columns <<< "$domain_info"
+	if ! [[ -z "${stored_password_array[${domain_columns[1]}]}" ]]; then
+		echo "Saved password found, use it (y,n)?"
+		calculated_password="${stored_password_array[${domain_columns[1]}]}";
+		read use_saved_pass
+	else
+		use_saved_pass='n'
+	fi
+
+	if [[ $use_saved_pass == 'n' ]];then
+		#echo "Password Index: {$1}"; #for debugging purposes
+		read -sp "Enter pass: " password
+		calc_password "${1}" "${password}"
+	fi
+
+	echo ''
+	echo "$calculated_password" #for debugging purposes
 	echo "Password saved to clipboard"
 	echo $calculated_password | xclip -selection c # this saves the password so that outside applications can read the clipboard
 	echo $calculated_password | xclip -i # this saves the password so that bash can read the clipboard
 }
 
-declare -A password_array
+function read_stored_password_db {
+	while read line
+	do
+		IFS=',' read -a account_array <<< "$line"
+		if ! [[ -z "${account_array[0]}" ]]; then
+			stored_password_array[${account_array[0]}]="${account_array[1]}"
+		fi
+		i=$(($i + 1))
+	done < ~/.genpass/stored_passwords
+}
 
 read_password_db() {
 	i=0
@@ -67,6 +92,7 @@ ask_user_to_select_account() {
 	echo "0> Add new site"
 	
 	read_password_db ~/.genpass/pass_db
+	read_stored_password_db
 
 	count=0
 	category_keys=( 'nil' )
@@ -139,6 +165,7 @@ elif [ $# == 2 ]; then
 
 	echo "${results}" > "${2}"
 else
+	read_stored_password_db
 	while read -r -u 6 domain_info
 	do
 		let count++

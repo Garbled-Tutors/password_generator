@@ -15,6 +15,13 @@ Column Three - This is the iteration of the password. Good password practices re
 Colmun Four - This is used to control the length and characters used in the password. Many jackass webdevelopers decided they wanted to enforce rules password length and composition and created websites limiting password lengths and preventing special characters. This column is used to conform to their rules. At the moment only 3 values are used, but with more usage of this program I will adjust this to create several uniform templates that will work with most websites
 Column Five - Account Nickname
 
+~/.genpass/stored_passwords
+
+This is an optional file. 
+Create it by running 
+genpass.sh export ~/.genpass/stored_passwords
+
+Basically this eases the process of updating your passwords for the new version. Run that command above and then start updating your passwords. Once a password is updated you should open up stored_passwords and remove the appropriate line. Either that or just keep it there until all of them are updated and then delete it. Up to you
 
 
 
