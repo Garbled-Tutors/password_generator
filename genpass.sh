@@ -14,10 +14,11 @@ function calc_password {
 	domain=${domain_columns[1]}
 	password_index=${domain_columns[2]}
 	restrictions=${domain_columns[3]}
+	pass_salt_location=${domain_columns[4]}
 	password=${2}
 
-	randa=$(sed "1q;d" ~/.genpass/pass_salt)
-	randb=$(sed "2q;d" ~/.genpass/pass_salt)
+	randa=$(sed "1q;d" ~/.genpass/$pass_salt_location)
+	randb=$(sed "2q;d" ~/.genpass/$pass_salt_location)
 	md5=$(echo -n $domain$randa$password_index$category$randb$password | md5sum | cut -f1 -d' ')
 
 	if [ $restrictions == 0 ]; then
@@ -159,7 +160,7 @@ elif [ $# == 2 ]; then
 
 		calc_password "${count}" "${password}"
 		if [[ -z "${domain_columns[1]}" ]]; then
-			results="${results}${domain_columns[4]},${calculated_password}${newline}";
+			results="${results}${domain_columns[5]},${calculated_password}${newline}";
 		else
 			results="${results}${domain_columns[1]},${calculated_password}${newline}";
 		fi
@@ -175,7 +176,7 @@ else
 
 		IFS=',' read -a domain_columns <<< "$domain_info"
 
-		if [ "${domain_columns[4]}" = "$1" -o "${domain_columns[1]}" = "$1" ]; then
+		if [ "${domain_columns[5]}" = "$1" -o "${domain_columns[1]}" = "$1" ]; then
 			get_password $count
 		fi
 	done 6< ~/.genpass/tmp_pass_db
