@@ -8,7 +8,7 @@ declare -A stored_password_array
 
 function calc_password {
 	# Expects two parameters 1: account line number, and 2: password
-	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
+	domain_info=$(sed "${1}q;d" ~/.genpass/tmp_pass_db)
 	IFS=',' read -a domain_columns <<< "$domain_info"
 	category=${domain_columns[0]}
 	domain=${domain_columns[1]}
@@ -36,7 +36,7 @@ function calc_password {
 
 function get_password {
 
-	domain_info=$(sed "${1}q;d" ~/.genpass/pass_db)
+	domain_info=$(sed "${1}q;d" ~/.genpass/tmp_pass_db)
 	IFS=',' read -a domain_columns <<< "$domain_info"
 	if ! [[ -z "${stored_password_array[${domain_columns[1]}]}" ]]; then
 		echo "Saved password found, use it (y,n)?"
@@ -53,7 +53,7 @@ function get_password {
 	fi
 
 	echo ''
-	echo "$calculated_password" #for debugging purposes
+	#echo "$calculated_password" #for debugging purposes
 	echo "Password saved to clipboard"
 	echo $calculated_password | xclip -selection c # this saves the password so that outside applications can read the clipboard
 	echo $calculated_password | xclip -i # this saves the password so that bash can read the clipboard
@@ -91,7 +91,7 @@ ask_user_to_select_account() {
 	echo "Choose an category"
 	echo "0> Add new site"
 	
-	read_password_db ~/.genpass/pass_db
+	read_password_db ~/.genpass/tmp_pass_db
 	read_stored_password_db
 
 	count=0
@@ -135,6 +135,9 @@ ask_user_to_select_account() {
 	fi
 }
 
+#combine all pass_db's into one file
+cat ~/.genpass/pass_db_* > ~/.genpass/tmp_pass_db
+
 if [ $# == 0 ]; then
 
 	ask_user_to_select_account
@@ -161,7 +164,7 @@ elif [ $# == 2 ]; then
 			results="${results}${domain_columns[1]},${calculated_password}${newline}";
 		fi
 
-	done 6< ~/.genpass/pass_db 
+	done 6< ~/.genpass/tmp_pass_db
 
 	echo "${results}" > "${2}"
 else
@@ -175,5 +178,5 @@ else
 		if [ "${domain_columns[4]}" = "$1" -o "${domain_columns[1]}" = "$1" ]; then
 			get_password $count
 		fi
-	done 6< ~/.genpass/pass_db 
+	done 6< ~/.genpass/tmp_pass_db
 fi
